@@ -1,7 +1,28 @@
 function toggleDone() {
-  $(this).parent().parent().toggleClass("success");
-  updateCounters();
-}
+  var checkbox = this;
+   var tableRow = $(this).parent().parent();
+
+   var songId = tableRow.data('id');
+   var isCreated = !tableRow.hasClass("success");
+
+   $.ajax({
+     type: "PUT",
+     url: "/songs/" + songId + ".json",
+     data: JSON.stringify({
+       song: { created: isCreated }
+     }),
+     contentType: "application/json",
+     dataType: "json"
+   })
+   .done(function(data) {
+     console.log(data);
+
+     tableRow.toggleClass("success", data.created);
+
+     updateCounters();
+   });
+ }
+
 
 function updateCounters() {
   $("#total-count").html($(".song").size());
@@ -79,9 +100,11 @@ function submitSong(event) {
 
 function cleanUpDoneSongs(event) {
   event.preventDefault();
-  $.when($(".success").remove())
-    .then(updateCounters);
-}
+    $.each($(".success"), function(index, tableRow) {
+      songId = $(tableRow).data('id');
+      deleteSong(songId);
+    });
+  }
 
 $(document).ready(function() {
   $("input[type=checkbox]").bind('change', toggleDone);
@@ -89,3 +112,16 @@ $(document).ready(function() {
   $("#clean-up").bind('click', cleanUpDoneSongs);
   updateCounters();
 });
+
+function deleteSong(songId) {
+  $.ajax({
+    type: "DELETE",
+    url: "/songs/" + songId + ".json",
+    contentType: "application/json",
+    dataType: "json"
+  })
+  .done(function(data) {
+    $('tr[data-id="'+songId+'"]').remove();
+    updateCounters();
+  });
+}
