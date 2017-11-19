@@ -9,65 +9,62 @@ function updateCounters() {
   $("#song-count").html($(".song").size() - $(".success").size());
 }
 
-function nextSongId() {
-  return $(".song").size() + 1;
-}
 
 function createSong(name) {
-  var checkboxId = "song-" + nextSongId();
-
-
-  var label = $('<label></label>')
-    .attr('for', checkboxId)
-    .html(name);
-
-  var checkbox = $('<input type="checkbox" value="1" />')
-    .attr('id', checkboxId)
-    .bind('change', toggleDone);
-
-  var tableRow = $('<tr class="song"></td>')
-    .append($('<td>').append(checkbox))
-    .append($('<td>').append(label));
-
-  $("#songList").append( tableRow );
-
-  updateCounters();
-}
-updateCounters();
-
-  var newTodo = { title: title, completed: false };
+  var newSong = { name: name, created: false };
 
   $.ajax({
     type: "POST",
-    url: "/todos.json",
+    url: "/songs.json",
     data: JSON.stringify({
-        todo: newTodo
+      song: newSong
     }),
     contentType: "application/json",
     dataType: "json"
+  })
+  .done(function(data) {
+    console.log(data);
 
-    .fail(function(error) {
-        console.log(error);
-      });
+    var checkboxId = data.id;
 
-      error_message = error.responseJSON.title[0];
-          showError(error_message);
-        });
-    }
+    var label = $('<label></label>')
+      .attr('for', checkboxId)
+      .html(name);
+
+    var checkbox = $('<input type="checkbox" value="1" />')
+      .attr('id', checkboxId)
+      .bind('change', toggleDone);
+
+    var tableRow = $('<tr class="song"></td>')
+      .attr('data-id', checkboxId)
+      .append($('<td>').append(checkbox))
+      .append($('<td>').append(label));
+
+    $("#songList").append(tableRow);
+
+    updateCounters();
+  })
+
+  .fail(function(error) {
+    console.log(error)
+    error_message = error.responseJSON.name[0];
+    showError(error_message);
+  });
+}
 
     function showError(message) {
       var errorHelpBlock = $('<span class="help-block"></span>')
         .attr('id', 'error_message')
         .text(message);
 
-      $("#formgroup-title")
+      $("#formgroup-name")
         .addClass("has-error")
         .append(errorHelpBlock);
     }
 
     function resetErrors() {
       $("#error_message").remove();
-      $("#formgroup-title").removeClass("has-error");
+      $("#formgroup-name").removeClass("has-error");
     }
 
 
