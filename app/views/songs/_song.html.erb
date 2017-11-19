@@ -1,0 +1,8 @@
+<tr class="song <%= song.created? ? "success" : "" %>" data-id="<%= song.id %>">
+  <td>
+    <input name="song[<%= song.id %>]" id="song-<%= song.id %>" type="checkbox" value="1" <%= song.created? ? 'checked="checked"' : '' %>>
+  </td>
+  <td>
+    <label for="song-<%= song.id %>"><%= song.name %></label>
+  </td>
+</tr>
